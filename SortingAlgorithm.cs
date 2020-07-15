@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Codingriver
 {
@@ -8,7 +9,7 @@ namespace Codingriver
     /// </summary>
     class SortingAlgorithm
     {
-        const int MAX_RANDOM_VALUE = 99; //测试数组的最大数值
+        const int MAX_RANDOM_VALUE = 1000; //测试数组的最大数值
         /// <summary>
         /// 冒泡排序（A版本）
         /// 从后往前扫描待排序序列，如果前一个元素比后一个元素大，就交换它们两个，对每一对相邻元素作同样的工作；这样，第一次扫描待排序的序列会找到一个最小值并将其放置在第一位，第二次扫描待排序的序列会找到一个第二小的值并将其放置在第二位，第三次扫描待排序的序列会找到一个第三小的值并将其放置在第三位，以此类推，直到将所有元素排序完毕；排序的过程就像泡泡不断的往上冒，总是小的泡泡在最上面，大的泡泡在最下面。
@@ -18,16 +19,16 @@ namespace Codingriver
         ///     当n非常大时，多项式以幂次方最大的为标准所以复杂度O=n(n-1)=O(n*n)
         /// </summary>
         /// <param name="A"></param>
-        void BubbleSort(int[]A)
+        void BubbleSort(int[] A)
         {
             int n = A.Length;
-            for (int i = 0; i < n-1; i++)
+            for (int i = 0; i < n - 1; i++)
             {
-                for (int j = 0; j < n-1-i; j++)
+                for (int j = 0; j < n - 1 - i; j++)
                 {
-                    if(A[j]>A[j+1])
+                    if (A[j] > A[j + 1])
                     {
-                        Swap(ref A[j + 1],ref A[j]);
+                        Swap(ref A[j + 1], ref A[j]);
                     }
                 }
             }
@@ -44,10 +45,10 @@ namespace Codingriver
         {
             int n = A.Length;
             bool sorted = false; //整体排序标志，首先假定尚未排序
-            while(!sorted)
+            while (!sorted)
             {
                 sorted = true;//假定有序
-                for (int i = 0; i < n-1; i++)
+                for (int i = 0; i < n - 1; i++)
                 {
                     if (A[i] > A[i + 1])
                     {
@@ -73,14 +74,14 @@ namespace Codingriver
         {
             int n = A.Length;
             int min;
-            for (int i = 0; i < n-1 ; i++)
+            for (int i = 0; i < n - 1; i++)
             {
                 min = i;
-                for (int j = i; j < n ; j++)
+                for (int j = i; j < n; j++)
                 {
                     if (A[min] > A[j])
                     {
-                        min = j ;
+                        min = j;
                     }
                 }
                 Swap(ref A[min], ref A[i]);
@@ -99,9 +100,9 @@ namespace Codingriver
         void InsertionSort(int[] A)
         {
             int n = A.Length;
-            for (int i = 1; i < n-1; i++) //第一个当做有序序列
+            for (int i = 1; i < n - 1; i++) //第一个当做有序序列
             {
-                for (int j = i; j >0&&A[j-1]>A[j]; j--) //内循环使用冒泡方式对前面有序序列进行插入
+                for (int j = i; j > 0 && A[j - 1] > A[j]; j--) //内循环使用冒泡方式对前面有序序列进行插入
                 {
                     Swap(ref A[j - 1], ref A[j]);
                 }
@@ -117,7 +118,7 @@ namespace Codingriver
         void InsertionSort_E(int[] A)
         {
             int n = A.Length;
-            int j,tmp;
+            int j, tmp;
             for (int i = 1; i < n - 1; i++) //第一个当做有序序列
             {
                 tmp = A[i];
@@ -137,22 +138,22 @@ namespace Codingriver
         ///    By combining the arguments of these two theorems h-sequences with O(log(n)) elements can be derived that lead to a very good performance in practice, as for instance the h-sequence of the program (Sedgewick [Sed 96]). But unfortunately, there seems to be no h-sequence that gives Shellsort a worst case performance of O(n·log(n)) (see [Sed 96]). It is an open question whether possibly the average complexity is in O(n·log(n))
         /// </summary>
         /// <param name="A"></param>
-        void ShellSort(int[]A)
+        void ShellSort(int[] A)
         {
             int n = A.Length;
             int h = 1;
-            while(h<3)
+            while (h < 3)
             {
                 h = h * 3 + 1;
             }
 
-            while(h>=1)
+            while (h >= 1)
             {
                 for (int i = h; i < n; i++)
                 {
                     for (int j = i; j >= h && A[j] < A[j - h]; j -= h)
                     {
-                        if(A[j-h]>A[j])
+                        if (A[j - h] > A[j])
                         {
                             Swap(ref A[j - h], ref A[j]);
                         }
@@ -176,16 +177,16 @@ namespace Codingriver
         ///             
         /// </summary>
         /// <param name="A"></param>
-        public void MergeSort(int[]A)
+        public void MergeSort(int[] A)
         {
             int n = A.Length;
             int[] reg = new int[n];
-            MergeSort(A, reg, 0, n - 1); 
+            MergeSort(A, reg, 0, n - 1);
         }
 
-        void MergeSort(int[] A,int[] reg,int start,int end)
+        void MergeSort(int[] A, int[] reg, int start, int end)
         {
-            if(start>=end)
+            if (start >= end)
             {
                 return;
             }
@@ -198,11 +199,11 @@ namespace Codingriver
             MergeSort(A, reg, start2, end2);
             int k = start;
             //首先两个子序列分别是有序的，这里对两个子序列合并，挑选两个子序列中最小的放入reg临时序列中，直到两个子序列中一个子序列被完全放入后结束，然后将另一个子序列复制到reg临时序列中，最后临时序列是合并后的有序序列了，复制会A中
-            while (start1<=end1&&start2<=end2) 
+            while (start1 <= end1 && start2 <= end2)
             {
                 reg[k++] = A[start1] < A[start2] ? A[start1++] : A[start2++]; //
             }
-            while(start1<=end1)
+            while (start1 <= end1)
             {
                 reg[k++] = A[start1++];
             }
@@ -210,7 +211,7 @@ namespace Codingriver
             {
                 reg[k++] = A[start2++];
             }
-            Array.Copy(reg, start, A, start,end - start + 1);
+            Array.Copy(reg, start, A, start, end - start + 1);
 
         }
 
@@ -239,7 +240,7 @@ namespace Codingriver
                     while (start2 < end2)
                         b[k++] = a[start2++];
                 }
-                Array.Copy(b,  a, n);
+                Array.Copy(b, a, n);
             }
         }
 
@@ -252,26 +253,26 @@ namespace Codingriver
         ///     
         /// </summary>
         /// <param name="A"></param>
-        public void QuickSort(int[]A)
+        public void QuickSort(int[] A)
         {
             int n = A.Length;
             QuickSort(A, 0, n - 1);
         }
 
-       
-        void QuickSort(int[] A,int low,int high)
+
+        void QuickSort(int[] A, int low, int high)
         {
             if (low >= high) return;
             int pivot = Partition(A, low, high);
             QuickSort(A, low, pivot - 1);
-            QuickSort(A, pivot + 1,high);
+            QuickSort(A, pivot + 1, high);
         }
-        
+
 
         int Partition(int[] A, int low, int high)
         {
             int pivot = A[low]; //基准数选取数组第一个元素（哨兵元素）
-            while (low<high)
+            while (low < high)
             {
                 while (low < high && A[high] >= pivot) --high;
                 A[low] = A[high];
@@ -299,7 +300,7 @@ namespace Codingriver
         ///             
         /// </summary>
         /// <param name="A"></param>
-        public void HeapSort(int[]A)
+        public void HeapSort(int[] A)
         {
             int n = A.Length;
             int i;
@@ -307,26 +308,26 @@ namespace Codingriver
             //构建后的二叉树根节点为整个二叉树中最大的节点
             for (i = n / 2 - 1; i >= 0; i--) //构建堆结构（完全二叉树，大顶堆）
                 MaxHeapify(A, i, n - 1);
-            for (i = n-1; i >0; i--)
+            for (i = n - 1; i > 0; i--)
             {
                 Swap(ref A[0], ref A[i]);
                 MaxHeapify(A, 0, i - 1);
             }
         }
 
-        void MaxHeapify(int[]A,int start,int end)
+        void MaxHeapify(int[] A, int start, int end)
         {
             // 建立父節點指標和子節點指標
             int dad = start;
             int son = dad * 2 + 1;
-            while(son<=end)// 若子節點指標在範圍內才做比較
+            while (son <= end)// 若子節點指標在範圍內才做比較
             {
                 if (son + 1 < end && A[son] < A[son + 1]) son++; // 先比較兩個子節點大小，選擇最大的
                 if (A[dad] > A[son]) return;//如果父節點大於子節點代表調整完畢，直接跳出函數
                 else
                 {   // 否則交換父子內容再繼續子節點和孫節點比較
                     Swap(ref A[dad], ref A[son]);
-                    dad = son;son = dad * 2 + 1;
+                    dad = son; son = dad * 2 + 1;
                 }
             }
 
@@ -353,7 +354,7 @@ namespace Codingriver
         ///                 当数组元素不是整数(不能转化成整数计算的，浮点(用指数和浮点分部转化)、字符等等)时，也不适合用计数排序
         /// </summary>
         /// <param name="A"></param>
-        public void CountingSort(int[]A)
+        public void CountingSort(int[] A)
         {
             int n = A.Length;
             int[] sorting = new int[n];
@@ -369,13 +370,13 @@ namespace Codingriver
             int[] counting = new int[max - min + 1];
             //2. 对计数数组各元素赋值，设长度为m
             for (int i = 0; i < n; i++)
-                counting[i - min]++;
+                counting[A[i] - min]++;
 
             //3. 计数数组变形，新元素的值是前面元素累加之和的值
             for (int i = 1; i < counting.Length; i++)
                 counting[i] += counting[i - 1];
             //4. 遍历A中的元素，填充到结果数组中去，从后往前遍历
-            for (int i = n-1; i >=0; i--)
+            for (int i = n - 1; i >= 0; i--)
                 sorting[--counting[A[i] - min]] = A[i];
             //5. 将结果复制到原始数组中
             Array.Copy(sorting, A, n);
@@ -401,7 +402,7 @@ namespace Codingriver
         /// </summary>
         /// <param name="A"></param>
         /// <param name="bucketCount"></param>
-        public void BucketSort(int[]A, int bucketCount = 10)
+        public void BucketSort(int[] A, int bucketCount = 1000)
         {
             int n = A.Length;
             int index;
@@ -419,7 +420,7 @@ namespace Codingriver
                 LinkedList<int> linkedList = bucket[i];
                 if (linkedList == null) continue;
                 var current = linkedList.First;
-                while(current!=null)
+                while (current != null)
                 {
                     A[index++] = current.Value;
                     current = current.Next;
@@ -431,24 +432,24 @@ namespace Codingriver
         /// </summary>
         /// <param name="list"></param>
         /// <param name="a"></param>
-        void BucketInsertSort(LinkedList<int>list,int a)
+        void BucketInsertSort(LinkedList<int> list, int a)
         {
             var current = list.First;
-            if(current==null||current.Value>a)
+            if (current == null || current.Value > a)
             {
                 list.AddFirst(a);
                 return;
             }
-            while(current!=null)
+            while (current != null)
             {
-                if(current.Next==null||current.Next.Value>a)
+                if (current.Next == null || current.Next.Value > a)
                 {
-                    list.AddAfter(current,a);
+                    list.AddAfter(current, a);
                     return;
                 }
                 current = current.Next;
             }
-            
+
 
 
         }
@@ -467,9 +468,9 @@ namespace Codingriver
         /// 桶排序：每个桶存储一定范围的数值；
         /// </summary>
         /// <param name="A"></param>
-        public void RadixSort(int[]A)
+        public void RadixSort(int[] A)
         {
-            
+
             int n = A.Length;
             const int BASE = 10;
             int exp = 1;
@@ -478,7 +479,7 @@ namespace Codingriver
             for (int i = 0; i < n; i++)
                 if (A[i] > max) max = A[i];
 
-            while (max/exp>0)
+            while (max / exp > 0)
             {
                 int[] bucket = new int[n];
 
@@ -491,9 +492,9 @@ namespace Codingriver
                 {
                     bucket[i] += bucket[i - 1];
                 }
-                for (int i = n-1; i >=0; i--)
+                for (int i = n - 1; i >= 0; i--)
                 {
-                    tmp[--bucket[A[i]/exp%BASE]] = A[i];
+                    tmp[--bucket[A[i] / exp % BASE]] = A[i];
                 }
                 Array.Copy(tmp, A, n);
                 exp *= BASE;
@@ -509,9 +510,9 @@ namespace Codingriver
         /// </summary>
         /// <param name="a"></param>
         /// <param name="b"></param>
-        void Swap_E(ref int a,ref int b )
+        void Swap_E(ref int a, ref int b)
         {
-            a = a + b;b = a - b;a = a - b;
+            a = a + b; b = a - b; a = a - b;
         }
         /// <summary>
         /// 交换
@@ -527,21 +528,115 @@ namespace Codingriver
 
         static void Main(string[] args)
         {
+            int[] A;
+            int count = 30000; //测试数组的长度
+            Stopwatch sw = new Stopwatch();
             SortingAlgorithm algorithm = new SortingAlgorithm();
-            int[] A = RandomArray(15);
-            PrintArray(A,0,A.Length);
-            //algorithm.BubbleSort(A);
-            //algorithm.BubbleSort_E(A);
-            //algorithm.SelectionSort(A);
-            //algorithm.InsertionSort(A);
-            //algorithm.InsertionSort_E(A);
-            //algorithm.ShellSort(A);
-            //algorithm.MergeSort(A);
-            //algorithm.MergeSort_E(A);
-            //algorithm.QuickSort(A);
-            //algorithm.HeapSort(A);
-            //algorithm.BucketSort(A);
+
+            
+
+            A = RandomArray(count);
+            PrintArray(A);
+            sw.Restart();
+            algorithm.BubbleSort(A);
+            sw.Stop();
+            Console.WriteLine("BubbleSort总共花费{0}ms.", sw.Elapsed.TotalMilliseconds);
+            PrintArray(A, 0, A.Length);
+
+            A = RandomArray(count);
+            PrintArray(A);
+            sw.Restart();
+            algorithm.BubbleSort_E(A);
+            sw.Stop();
+            Console.WriteLine("BubbleSort_E总共花费{0}ms.", sw.Elapsed.TotalMilliseconds);
+            PrintArray(A, 0, A.Length);
+
+            A = RandomArray(count);
+            PrintArray(A);
+            sw.Restart();
+            algorithm.SelectionSort(A);
+            sw.Stop();
+            Console.WriteLine("SelectionSort总共花费{0}ms.", sw.Elapsed.TotalMilliseconds);
+            PrintArray(A, 0, A.Length);
+
+            A = RandomArray(count);
+            PrintArray(A);
+            sw.Restart();
+            algorithm.InsertionSort(A);
+            sw.Stop();
+            Console.WriteLine("InsertionSort总共花费{0}ms.", sw.Elapsed.TotalMilliseconds);
+            PrintArray(A, 0, A.Length);
+
+            A = RandomArray(count);
+            PrintArray(A);
+            sw.Restart();
+            algorithm.InsertionSort_E(A);
+            sw.Stop();
+            Console.WriteLine("InsertionSort_E总共花费{0}ms.", sw.Elapsed.TotalMilliseconds);
+            PrintArray(A, 0, A.Length);
+
+            A = RandomArray(count);
+            PrintArray(A);
+            sw.Restart();
+            algorithm.ShellSort(A);
+            sw.Stop();
+            Console.WriteLine("ShellSort总共花费{0}ms.", sw.Elapsed.TotalMilliseconds);
+            PrintArray(A, 0, A.Length);
+
+            A = RandomArray(count);
+            PrintArray(A);
+            sw.Restart();
+            algorithm.MergeSort(A);
+            sw.Stop();
+            Console.WriteLine("MergeSort总共花费{0}ms.", sw.Elapsed.TotalMilliseconds);
+            PrintArray(A, 0, A.Length);
+
+            A = RandomArray(count);
+            PrintArray(A);
+            sw.Restart();
+            algorithm.MergeSort_E(A);
+            sw.Stop();
+            Console.WriteLine("MergeSort_E总共花费{0}ms.", sw.Elapsed.TotalMilliseconds);
+            PrintArray(A, 0, A.Length);
+
+            A = RandomArray(count);
+            PrintArray(A);
+            sw.Restart();
+            algorithm.QuickSort(A);
+            sw.Stop();
+            Console.WriteLine("QuickSort总共花费{0}ms.", sw.Elapsed.TotalMilliseconds);
+            PrintArray(A, 0, A.Length);
+
+            A = RandomArray(count);
+            PrintArray(A);
+            sw.Restart();
+            algorithm.HeapSort(A);
+            sw.Stop();
+            Console.WriteLine("HeapSort总共花费{0}ms.", sw.Elapsed.TotalMilliseconds);
+            PrintArray(A, 0, A.Length);
+
+            A = RandomArray(count);
+            PrintArray(A);
+            sw.Restart();
+            algorithm.CountingSort(A);
+            sw.Stop();
+            Console.WriteLine("CountingSort总共花费{0}ms.", sw.Elapsed.TotalMilliseconds);
+            PrintArray(A, 0, A.Length);
+
+            A = RandomArray(count);
+            PrintArray(A);
+            sw.Restart();
+            algorithm.BucketSort(A);
+            sw.Stop();
+            Console.WriteLine("BucketSort总共花费{0}ms.", sw.Elapsed.TotalMilliseconds);
+            PrintArray(A, 0, A.Length);
+
+            A = RandomArray(count);
+            PrintArray(A);
+            sw.Restart();
             algorithm.RadixSort(A);
+            sw.Stop();
+            Console.WriteLine("RadixSort总共花费{0}ms.", sw.Elapsed.TotalMilliseconds);
             PrintArray(A, 0, A.Length);
             Console.ReadKey();
         }
@@ -557,8 +652,19 @@ namespace Codingriver
             return A;
         }
 
-        static void PrintArray(int[]A,int start,int end)
+        static void PrintArray(int[] A)
         {
+            return; //注释输出，测试排序耗时
+            System.Text.StringBuilder builder = new System.Text.StringBuilder();
+            for (int i = 0; i < A.Length; i++)
+            {
+                builder.AppendFormat("{0},", A[i]);
+            }
+            Console.WriteLine(" ------> {0}", builder.ToString());
+        }
+        static void PrintArray(int[] A, int start, int end)
+        {
+            return; //注释输出，测试排序耗时
             end = A.Length < end ? A.Length : end;
             start = start < 0 ? 0 : start;
             System.Text.StringBuilder builder = new System.Text.StringBuilder();
@@ -568,10 +674,10 @@ namespace Codingriver
             }
             for (int i = start; i < end; i++)
             {
-                builder.AppendFormat("{0},",A[i]);
+                builder.AppendFormat("{0},", A[i]);
             }
             Console.WriteLine(" ------> {0}", builder.ToString());
         }
-        
+
     }
 }
