@@ -401,15 +401,24 @@ namespace Codingriver
         ///这里桶内排序使用的是链表指针方式，桶内复杂度为O(1)，可以忽略，总复杂度为O(N)
         /// </summary>
         /// <param name="A"></param>
-        /// <param name="bucketCount"></param>
-        public void BucketSort(int[] A, int bucketCount = 1000)
+        /// <param name="bucketSize">每个桶内数据的预期数量</param>
+        public void BucketSort(int[] A, int bucketSize = 5)
         {
             int n = A.Length;
             int index;
+            //1.找出数组中最大值、最小值
+            int max = int.MinValue;
+            int min = int.MaxValue;
+            for (int i = 0; i < n; i++)
+            {
+                max = Math.Max(max, A[i]);
+                min = Math.Min(min, A[i]);
+            }
+            int bucketCount = (max - min) / bucketSize + 1;
             LinkedList<int>[] bucket = new LinkedList<int>[bucketCount];
             for (int i = 0; i < n; i++)
             {
-                index = A[i] / bucketCount;
+                index = (A[i]-min) / bucketSize;
                 if (bucket[index] == null)
                     bucket[index] = new LinkedList<int>();
                 BucketInsertSort(bucket[index], A[i]);
