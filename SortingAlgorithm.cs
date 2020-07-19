@@ -9,7 +9,8 @@ namespace Codingriver
     /// </summary>
     class SortingAlgorithm
     {
-        const int MAX_RANDOM_VALUE = 1000; //测试数组的最大数值
+        const int MAX_RANDOM_VALUE = 1000; //数组元素最大值
+        const int ARRAY_LENGTH = 10;//数组长度
         /// <summary>
         /// 冒泡排序（A版本）
         /// 从后往前扫描待排序序列，如果前一个元素比后一个元素大，就交换它们两个，对每一对相邻元素作同样的工作；这样，第一次扫描待排序的序列会找到一个最小值并将其放置在第一位，第二次扫描待排序的序列会找到一个第二小的值并将其放置在第二位，第三次扫描待排序的序列会找到一个第三小的值并将其放置在第三位，以此类推，直到将所有元素排序完毕；排序的过程就像泡泡不断的往上冒，总是小的泡泡在最上面，大的泡泡在最下面。
@@ -282,7 +283,41 @@ namespace Codingriver
             A[low] = pivot;
             return low;
         }
+        public void QuickSort_V(int[] A)
+        {
+            Stack<int> stack = new Stack<int>();
+            int pivot;
+            int low = 0;
+            int high = A.Length - 1;
+            int start, end;
+            stack.Push(high);
+            stack.Push(low);
 
+            while (stack.Count > 0)
+            {
+                start = low = stack.Pop();
+                end = high = stack.Pop();
+
+                if (low >= high)
+                    continue;
+
+                pivot = A[low];
+                while (low < high)
+                {
+                    while (low < high && A[high] >= pivot) high--;
+                    A[low] = A[high];
+
+                    while (low < high && A[low] <= pivot) low++;
+                    A[high] = A[low];
+                }
+                A[low] = pivot;
+                stack.Push(low - 1);
+                stack.Push(start);
+                stack.Push(end);
+                stack.Push(low + 1);
+
+            }
+        }
         /// <summary>
         /// 堆排序
         /// 堆排序（Heapsort）是指利用堆这种数据结构所设计的一种排序算法。
@@ -418,7 +453,7 @@ namespace Codingriver
             LinkedList<int>[] bucket = new LinkedList<int>[bucketCount];
             for (int i = 0; i < n; i++)
             {
-                index = (A[i]-min) / bucketSize;
+                index = (A[i] - min) / bucketSize;
                 if (bucket[index] == null)
                     bucket[index] = new LinkedList<int>();
                 BucketInsertSort(bucket[index], A[i]);
@@ -538,13 +573,16 @@ namespace Codingriver
         static void Main(string[] args)
         {
             int[] A;
-            int count = 30000; //测试数组的长度
+            int count = ARRAY_LENGTH; //测试数组的长度
+            int[] arr = new int[count];
+            A = new int[count];
             Stopwatch sw = new Stopwatch();
             SortingAlgorithm algorithm = new SortingAlgorithm();
+            Console.WriteLine("数组长度{0}，数组元素(0--{1}).", count, MAX_RANDOM_VALUE);
+            arr = RandomArray(count);
+            //PrintArray(arr,true);
 
-            
-
-            A = RandomArray(count);
+            Array.Copy(arr, A, count);
             PrintArray(A);
             sw.Restart();
             algorithm.BubbleSort(A);
@@ -552,7 +590,7 @@ namespace Codingriver
             Console.WriteLine("BubbleSort总共花费{0}ms.", sw.Elapsed.TotalMilliseconds);
             PrintArray(A, 0, A.Length);
 
-            A = RandomArray(count);
+            Array.Copy(arr, A, count);
             PrintArray(A);
             sw.Restart();
             algorithm.BubbleSort_E(A);
@@ -560,7 +598,7 @@ namespace Codingriver
             Console.WriteLine("BubbleSort_E总共花费{0}ms.", sw.Elapsed.TotalMilliseconds);
             PrintArray(A, 0, A.Length);
 
-            A = RandomArray(count);
+            Array.Copy(arr, A, count);
             PrintArray(A);
             sw.Restart();
             algorithm.SelectionSort(A);
@@ -568,7 +606,7 @@ namespace Codingriver
             Console.WriteLine("SelectionSort总共花费{0}ms.", sw.Elapsed.TotalMilliseconds);
             PrintArray(A, 0, A.Length);
 
-            A = RandomArray(count);
+            Array.Copy(arr, A, count);
             PrintArray(A);
             sw.Restart();
             algorithm.InsertionSort(A);
@@ -576,7 +614,7 @@ namespace Codingriver
             Console.WriteLine("InsertionSort总共花费{0}ms.", sw.Elapsed.TotalMilliseconds);
             PrintArray(A, 0, A.Length);
 
-            A = RandomArray(count);
+            Array.Copy(arr, A, count);
             PrintArray(A);
             sw.Restart();
             algorithm.InsertionSort_E(A);
@@ -584,7 +622,7 @@ namespace Codingriver
             Console.WriteLine("InsertionSort_E总共花费{0}ms.", sw.Elapsed.TotalMilliseconds);
             PrintArray(A, 0, A.Length);
 
-            A = RandomArray(count);
+            Array.Copy(arr, A, count);
             PrintArray(A);
             sw.Restart();
             algorithm.ShellSort(A);
@@ -592,7 +630,7 @@ namespace Codingriver
             Console.WriteLine("ShellSort总共花费{0}ms.", sw.Elapsed.TotalMilliseconds);
             PrintArray(A, 0, A.Length);
 
-            A = RandomArray(count);
+            Array.Copy(arr, A, count);
             PrintArray(A);
             sw.Restart();
             algorithm.MergeSort(A);
@@ -600,7 +638,7 @@ namespace Codingriver
             Console.WriteLine("MergeSort总共花费{0}ms.", sw.Elapsed.TotalMilliseconds);
             PrintArray(A, 0, A.Length);
 
-            A = RandomArray(count);
+            Array.Copy(arr, A, count);
             PrintArray(A);
             sw.Restart();
             algorithm.MergeSort_E(A);
@@ -608,7 +646,7 @@ namespace Codingriver
             Console.WriteLine("MergeSort_E总共花费{0}ms.", sw.Elapsed.TotalMilliseconds);
             PrintArray(A, 0, A.Length);
 
-            A = RandomArray(count);
+            Array.Copy(arr, A, count);
             PrintArray(A);
             sw.Restart();
             algorithm.QuickSort(A);
@@ -616,7 +654,15 @@ namespace Codingriver
             Console.WriteLine("QuickSort总共花费{0}ms.", sw.Elapsed.TotalMilliseconds);
             PrintArray(A, 0, A.Length);
 
-            A = RandomArray(count);
+            Array.Copy(arr, A, count);
+            PrintArray(A);
+            sw.Restart();
+            algorithm.QuickSort_V(A);
+            sw.Stop();
+            Console.WriteLine("QuickSort_V总共花费{0}ms.", sw.Elapsed.TotalMilliseconds);
+            PrintArray(A, 0, A.Length);
+
+            Array.Copy(arr, A, count);
             PrintArray(A);
             sw.Restart();
             algorithm.HeapSort(A);
@@ -624,7 +670,7 @@ namespace Codingriver
             Console.WriteLine("HeapSort总共花费{0}ms.", sw.Elapsed.TotalMilliseconds);
             PrintArray(A, 0, A.Length);
 
-            A = RandomArray(count);
+            Array.Copy(arr, A, count);
             PrintArray(A);
             sw.Restart();
             algorithm.CountingSort(A);
@@ -632,7 +678,7 @@ namespace Codingriver
             Console.WriteLine("CountingSort总共花费{0}ms.", sw.Elapsed.TotalMilliseconds);
             PrintArray(A, 0, A.Length);
 
-            A = RandomArray(count);
+            Array.Copy(arr, A, count);
             PrintArray(A);
             sw.Restart();
             algorithm.BucketSort(A);
@@ -640,7 +686,7 @@ namespace Codingriver
             Console.WriteLine("BucketSort总共花费{0}ms.", sw.Elapsed.TotalMilliseconds);
             PrintArray(A, 0, A.Length);
 
-            A = RandomArray(count);
+            Array.Copy(arr, A, count);
             PrintArray(A);
             sw.Restart();
             algorithm.RadixSort(A);
@@ -661,9 +707,12 @@ namespace Codingriver
             return A;
         }
 
-        static void PrintArray(int[] A)
+        static void PrintArray(int[] A,bool p=false)
         {
-            return; //注释输出，测试排序耗时
+            if(!p)
+            {
+                return; //注释输出，测试排序耗时
+            }
             System.Text.StringBuilder builder = new System.Text.StringBuilder();
             for (int i = 0; i < A.Length; i++)
             {
@@ -671,9 +720,12 @@ namespace Codingriver
             }
             Console.WriteLine(" ------> {0}", builder.ToString());
         }
-        static void PrintArray(int[] A, int start, int end)
+        static void PrintArray(int[] A, int start, int end, bool p = false)
         {
-            return; //注释输出，测试排序耗时
+            if (!p)
+            {
+                return; //注释输出，测试排序耗时
+            }
             end = A.Length < end ? A.Length : end;
             start = start < 0 ? 0 : start;
             System.Text.StringBuilder builder = new System.Text.StringBuilder();
