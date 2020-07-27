@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Codingriver_AVL
@@ -210,10 +210,7 @@ namespace Codingriver_AVL
             return GetMaxNodeCountByDepth(i-1) * 2;
         }
 
-        public int MaxHeight(Node a,Node b)
-        {
-            return a == null ? (b == null ? 0 : b.H) : (b == null ? a.H : a.H > b.H ? a.H : b.H);
-        }
+
 
         /// <summary>
         /// 树的高度
@@ -224,6 +221,11 @@ namespace Codingriver_AVL
         public int Height(Node a)
         {
             return a == null ? 0 : a.H;
+        }
+
+        public int MaxHeight(Node a, Node b)
+        {
+            return a == null ? (b == null ? 0 : b.H) : (b == null ? a.H : a.H > b.H ? a.H : b.H);
         }
 
         /// <summary>
@@ -447,7 +449,10 @@ namespace Codingriver_AVL
             k1 = k2.L;
             k2.L = k1.R;
             k1.R = k2;
+            k2.H = MaxHeight(k2.L, k2.R)+1;
+            k1.H= MaxHeight(k1.L, k1.R)+1;
             return k1;
+            
         }
 
         /// <summary>
@@ -472,7 +477,10 @@ namespace Codingriver_AVL
             k2 = k1.R;
             k1.R = k2.L;
             k2.L = k1;
-            return k1;
+            
+            k1.H = MaxHeight(k1.L, k1.R) + 1;
+            k2.H = MaxHeight(k2.L, k2.R) + 1;
+            return k2;
         }
 
         /// <summary>
