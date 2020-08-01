@@ -10,14 +10,15 @@ namespace Codingriver_AVL
         public Node Parent;//parent
         public Node L; //left
         public Node R; //right
-        public int H; //height;
+        public int H=1; //height;
 
-        public Node(int key, Node parent=null, Node left=null, Node right=null)
+        public Node(int key, Node parent=null, Node left=null, Node right=null,int h=1)
         {
             Key = key;
             Parent = parent;
             L = left;
             R = right;
+            H = h;
         }
 
 
@@ -100,6 +101,24 @@ namespace Codingriver_AVL
 
             return a.Key == b.Key;
         }
+        public static bool operator ==(Node a, int key)
+        {
+            if (a is null )
+            {
+                return false;
+            }
+
+            return a.Key == key;
+        }
+        public static bool operator ==(int key,Node a)
+        {
+            if (a is null)
+            {
+                return false;
+            }
+
+            return a.Key == key;
+        }
         public static bool operator !=(Node a, Node b)
         {
             if (a is null && b is null)
@@ -112,7 +131,24 @@ namespace Codingriver_AVL
             }
             return a.Key != b.Key;
         }
+        public static bool operator !=(Node a, int key)
+        {
+            if (a is null)
+            {
+                return false;
+            }
 
+            return a.Key != key;
+        }
+        public static bool operator !=(int key, Node a)
+        {
+            if (a is null)
+            {
+                return false;
+            }
+
+            return a.Key != key;
+        }
         #endregion
     }
     #endregion
@@ -132,7 +168,10 @@ namespace Codingriver_AVL
         #region create node
         public Node CreateNode(int key, Node parent = null, Node left = null, Node right = null)
         {
-            return new Node(key, parent, left, right);
+            Node n=new Node(key, parent, left, right);
+            if (parent > n) parent.L = n;
+            else if(parent<n) parent.R = n;
+            return n;
         }
         public Node CreateLNode(int key, Node parent)
         {
@@ -189,6 +228,48 @@ namespace Codingriver_AVL
         }
 
         /// <summary>
+        /// 兄弟
+        /// </summary>
+        /// <param name="n"></param>
+        /// <returns></returns>
+        public Node Sibling(Node n)
+        {
+            return IsLeft(n) ? n.Parent.R : n.Parent.L;
+        }
+
+        /// <summary>
+        /// 叔叔
+        /// </summary>
+        /// <param name="n"></param>
+        /// <returns></returns>
+        public Node Uncle(Node n)
+        {
+            return IsLeft(n.Parent) ? n.Parent.Parent.R : n.Parent.Parent.L;
+        }
+
+        /// <summary>
+        /// 建立父子关系
+        /// </summary>
+        /// <param name="parent"></param>
+        /// <param name="x"></param>
+        public void Connect(Node parent,Node x)
+        {
+            if (parent == null) 
+            {
+                Root = x;
+                x.Parent = null;
+                return;
+            }
+            if (parent == x)
+                return;
+                
+            if (x == null) return;
+            x.Parent = parent;
+            if (x > parent) parent.R = x;
+            else parent.L = x;
+        }
+
+        /// <summary>
         /// 树的深度
         /// </summary>
         /// <param name="n"></param>
@@ -214,7 +295,7 @@ namespace Codingriver_AVL
 
         /// <summary>
         /// 树的高度
-        /// 树的高度为最大层次。即空的二叉树的高度是0，非空树的高度等于它的最大层次(根的层次为1，根的子节点为第2层，依次类推)
+        /// 树的高度为最大层次。即空的二叉树的高度是0，非空树的高度等于它的最大层次(根的层次为1，根的子节点为第2层，依次类推)，这里空树的高度取0，有的教材资料是-1
         /// </summary>
         /// <param name="a"></param>
         /// <returns></returns>
@@ -226,6 +307,37 @@ namespace Codingriver_AVL
         public int MaxHeight(Node a, Node b)
         {
             return a == null ? (b == null ? 0 : b.H) : (b == null ? a.H : a.H > b.H ? a.H : b.H);
+        }
+
+        public int UpdateHeight(Node a)
+        {
+            a.H = MaxHeight(a.L, a.R) + 1;
+            return a.H;
+        }
+
+        /// <summary>
+        /// 是否平衡
+        /// </summary>
+        /// <param name="tree"></param>
+        /// <returns></returns>
+        public bool IsBalanced(Node tree)
+        {
+            return -2 < Height(tree.L) - Height(tree.R) && Height(tree.L) - Height(tree.R) < 2;
+        }
+
+
+        /// <summary>
+        /// 在左、右孩子中取更高者
+        /// </summary>
+        /// <param name="tree"></param>
+        /// <returns></returns>
+        public Node TallerChild(Node tree)
+        {
+            if (tree == null)
+                return null;
+            if (Height(tree.L) > Height(tree.R))
+                return tree.L;
+            else return tree.R;
         }
 
         /// <summary>
@@ -255,6 +367,31 @@ namespace Codingriver_AVL
             return n;
         }
 
+        /// <summary>
+        /// 查找键值key的节点并且返回（key对应节点为命中节点）
+        /// </summary>
+        /// <param name="tree">子树</param>
+        /// <param name="key">查找键值</param>
+        /// <param name="hot">返回命中节点的父节点，如果不存在命中节点则返回预判命中节点的父节点；（当命中节点为tree时，hot为NULL）</param>
+        /// <returns>命中节点</returns>
+        public Node SearchIn(Node tree, int key, out Node hot)
+        {
+            // hot :如果没有命中节点，则hot命中后做多只有一个节点，且key是对应另外一个孩子空节点位置
+
+            Node n=tree;
+            if (tree == key) //在子树根节点tree处命中
+            {
+                hot = null;
+                return tree;
+            }
+
+            for(; ; )
+            {
+                hot = n;
+                n = n > key ? n.L : n.R;
+                if (n==null||n == key) return n; //返回命中节点，hot指向父节点，hot必然命中（在key不存在时,n==null）
+            }
+        }
         #endregion
 
         #region 前驱节点、后继节点
@@ -425,270 +562,240 @@ namespace Codingriver_AVL
         }
         #endregion
 
-        #region 旋转 LL、LR、RR、RL
+        #region 旋转 
 
         /// <summary>
-        /// LL旋转
+        /// 左旋转，逆时针旋转,单旋
         /// </summary>
-        /// <returns>返回旋转后根节点</returns>
-        Node LLRotation()
+        /// <param name="tree">非空孙辈节点</param>
+        /// <returns>该树新的的根节点</returns>
+        public Node Zag(Node tree)
         {
-            return LLRotation(Root);
+            Node v = tree, p = v.Parent, g = p.Parent, r = g.Parent;
+            Node a = g, b = p, c = v;
+            Node T0 = g.L, T1 = p.L, T2 = v.L, T3 = v.R;
+            a.L = T0; if (T0 != null) T0.Parent = a;
+            a.R = T1; if (T1 != null) T1.Parent = a; UpdateHeight(a);
+            c.L = T2; if (T2 != null) T2.Parent = c;
+            c.R = T3; if (T3 != null) T3.Parent = c; UpdateHeight(c);
+            b.L = a; a.Parent = b;
+            b.R = c; c.Parent = b; UpdateHeight(b);
+            Connect(r, b); //根节点和父节点联接
+            return b;//该树新的的根节点
         }
 
         /// <summary>
-        /// LL旋转
+        /// 右旋转，顺时针旋转,单旋
         /// </summary>
-        /// <param name="n">根节点</param>
-        /// <returns>返回旋转后根节点</returns>
-        Node LLRotation(Node n)
+        /// <param name="tree">非空孙辈节点</param>
+        /// <returns>该树新的的根节点</returns>
+        public Node Zig(Node tree)
         {
-            Node k1;
-            Node k2 = n;
+            Node v = tree, p = v.Parent, g = p.Parent, r = g.Parent;
+            Node a = v, b = p, c = g;
+            Node T0 = v.L, T1 = v.R, T2 = p.R, T3 = g.R;
+            a.L = T0; if (T0 != null) T0.Parent = a;
+            a.R = T1; if (T1 != null) T1.Parent = a; UpdateHeight(a);
+            c.L = T2; if (T2 != null) T2.Parent = c;
+            c.R = T3; if (T3 != null) T3.Parent = c; UpdateHeight(c);
+            b.L = a; a.Parent = b;
+            b.R = c; c.Parent = b; UpdateHeight(b);
 
-            k1 = k2.L;
-            k2.L = k1.R;
-            k1.R = k2;
-            k2.H = MaxHeight(k2.L, k2.R)+1;
-            k1.H= MaxHeight(k1.L, k1.R)+1;
-            return k1;
-            
+            Connect(r, b); //根节点和父节点联接
+            return b;//该树新的的根节点
         }
 
         /// <summary>
-        /// RR旋转
+        /// 双旋转，先tree的父节点Zag后对tree的祖父Zig，先对p左旋，后对g右旋
         /// </summary>
-        /// <returns>返回旋转后根节点</returns>
-        Node RRRotation()
+        /// <param name="tree">非空孙辈节点</param>
+        /// <returns>该树新的的根节点</returns>
+        public Node ZigZag(Node tree)
         {
-            return RRRotation(Root);
+            Node v = tree, p = v.Parent, g = p.Parent, r = g.Parent;
+            Node a = p, b = v, c = g;
+            Node T0 = p.L, T1 = v.L, T2 = v.R, T3 = g.R;
+            a.L = T0; if (T0 != null) T0.Parent = a;
+            a.R = T1; if (T1 != null) T1.Parent = a; UpdateHeight(a);
+            c.L = T2; if (T2 != null) T2.Parent = c;
+            c.R = T3; if (T3 != null) T3.Parent = c; UpdateHeight(c);
+            b.L = a; a.Parent = b;
+            b.R = c; c.Parent = b; UpdateHeight(b);
+            Connect(r, b); //根节点和父节点联接
+            return b;//该树新的的根节点
         }
 
         /// <summary>
-        /// RR旋转
+        /// 双旋转，先Zig后Zag，先对p右旋，后对g左旋
         /// </summary>
-        /// <param name="n">根节点</param>
-        /// <returns>返回旋转后根节点</returns>
-        Node RRRotation(Node n)
+        /// <param name="tree">非空孙辈节点</param>
+        /// <returns>该树新的的根节点</returns>
+        public Node ZagZig(Node tree)
         {
-            Node k1=n;
-            Node k2 ;
-
-            k2 = k1.R;
-            k1.R = k2.L;
-            k2.L = k1;
-            
-            k1.H = MaxHeight(k1.L, k1.R) + 1;
-            k2.H = MaxHeight(k2.L, k2.R) + 1;
-            return k2;
+            Node v = tree, p = v.Parent, g = p.Parent, r = g.Parent;
+            Node a = g, b = v, c = p;
+            Node T0 = g.L, T1 = v.L, T2 = v.R, T3 = p.R;
+            a.L = T0; if (T0 != null) T0.Parent = a;
+            a.R = T1; if (T1 != null) T1.Parent = a; UpdateHeight(a);
+            c.L = T2; if (T2 != null) T2.Parent = c;
+            c.R = T3; if (T3 != null) T3.Parent = c; UpdateHeight(c);
+            b.L = a; a.Parent = b;
+            b.R = c; c.Parent = b; UpdateHeight(b);
+            Connect(r, b); //根节点和父节点联接
+            return b;//该树新的的根节点
         }
 
         /// <summary>
-        /// LR旋转
+        /// 旋转
         /// </summary>
-        /// <returns>返回旋转后根节点</returns>
-        Node LRRotation()
+        /// <param name="r"></param>
+        /// <returns></returns>
+        Node RotateAt(Node r)
         {
-            return LRRotation(Root);
+            Node g = r, p = TallerChild(g), v = TallerChild(p);
+            if (IsLeft(p))
+            {
+                if (IsLeft(v)) return Zig(v);
+                else return ZigZag(v);
+
+            }
+            else
+            {
+                if (IsRight(v)) return Zag(v);
+                else return ZagZig(v);
+            }
         }
 
-        /// <summary>
-        /// LR旋转
-        /// </summary>
-        /// <param name="n">根节点</param>
-        /// <returns>返回旋转后根节点</returns>
-        Node LRRotation(Node n)
-        {
-            Node k3=n;
-            k3.L = RRRotation(k3.L);
-            return LLRotation(k3);
-        }
 
-        /// <summary>
-        /// RL旋转
-        /// </summary>
-        /// <returns>返回旋转后根节点</returns>
-        Node RLRotation()
-        {
-            return RLRotation(Root);
-        }
-
-        /// <summary>
-        /// RL旋转
-        /// </summary>
-        /// <param name="n">根节点</param>
-        /// <returns>返回旋转后根节点</returns>
-        Node RLRotation(Node n)
-        {
-            Node k1 = n;
-            k1.R = LLRotation(k1.R);
-            return RRRotation(k1);
-        }
 
         #endregion
 
         #region 增、删、查
+        public Node Insert(int key)
+        {
+            Console.WriteLine($"Insert:{key}"); //打印日志
+            Node n = Insert(Root, key);
+            PrintTree(Root);//打印日志 打印树
+            return n;
+        }
+        public Node Insert(Node tree, int key)
+        {
+            if (Root == null)
+                return Root = CreateNode(key);
+
+            Node hot;
+            Node x = SearchIn(tree, key, out hot);
+            if (x != null) return x;
+            x = CreateNode(key, hot); //hot最多只有一个节点
+
+            for (Node n = hot; n != null; n = n.Parent) // //从x之父出发向上，逐层检查各代祖先g
+            {
+                if (!IsBalanced(n)) //一旦发现g失衡，则（采用“3 + 4”算法）使之复衡，并将子树
+                {
+                    RotateAt(n);
+                    break; //g复衡后，局部子树高度必然复原；其祖先亦必如此，故调整随即结束
+                }
+                else  //否则（g依然平衡），只需简单地
+                    UpdateHeight(n); //更新其高度（注意：即便g未失衡，高度亦可能增加）
+            } // 至多只需一次调整；若果真做过调整，则全树高度必然复原
+            return x; //返回新节点位置
+
+        }
+
+
         /// <summary>
         /// 查找
         /// </summary>
+        /// <param name="tree"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        public Node Search(int key)
+        public Node Search(Node tree,int key)
         {
-            return Search(Root, key);
+            return SearchIn(tree, key, out _);
         }
-        public Node Search(Node node,int key)
-        {
-            if(node == null|| node.Key==key)
-            {
-                return node;
-            }
 
-            if (node.Key > key)
-                return Search(node.L,key);
-            else
-                return Search(node.R, key);
-        }
+
+        #endregion
+
+
+
+
+
 
 
         /// <summary>
-        /// 插入
+        /// 删除节点
         /// </summary>
-        /// <param name="tree">AVL树的根结点</param>
-        /// <param name="key">插入的结点的键值</param>
+        /// <param name="key"></param>
         /// <returns></returns>
-        public Node Insert( Node tree, int key)
+        Node Remove(int key)
         {
-            if(tree==null)
-            {
-                // 创建节点
-                tree=CreateNode(key);
-            }
-            else if(key<Root) // 应该将key插入到"tree的左子树"的情况
-            {
-                tree.L = Insert(tree.L, key);
-                // 插入节点后，若AVL树失去平衡，则进行相应的调节。
-                if (Height(tree.L) - Height(tree.R) == 2)
-                {
-                    if (key < tree.L.Key)
-                        tree = LLRotation(tree);
-                    else
-                        tree = LRRotation(tree);
-                }
-
-                
-            }
-            else if(key>Root) // 应该将key插入到"tree的右子树"的情况
-            {
-                tree.R = Insert(tree.R, key);
-                // 插入节点后，若AVL树失去平衡，则进行相应的调节。
-                if (Height(tree.R) - Height(tree.L) == 2)
-                {
-                    if(key>tree.L.Key)
-                        tree = RRRotation(tree);
-                    else
-                        tree = RLRotation(tree);
-                }
-
-            }
-            else // key ==n.Key
-            {
-                throw new System.Exception("不允许插入相同键值的节点");
-            }
-            tree.H = MaxHeight(tree.L, tree.R) + 1;
-            return tree;
+            Console.WriteLine($"Remove:{key}"); //打印日志
+            Node n = Remove(Root, key);
+            PrintTree(Root);//打印日志 打印树
+            return n;
         }
-        
-        public Node Remove(Node n)
+        Node Remove(Node tree,int key)
         {
-            return Remove(Root, n);
+            Node hot;
+            Node x = SearchIn(tree, key, out hot);
+            x = RemoveAt(x, out hot);
+
+            for (Node n = hot; n != null; n = n.Parent) // //从x之父出发向上，逐层检查各代祖先g
+            {
+                if (!IsBalanced(n)) //一旦发现g失衡，则（采用“3 + 4”算法）使之复衡，并将子树
+                {
+                    RotateAt(n);
+                    break; //g复衡后，局部子树高度必然复原；其祖先亦必如此，故调整随即结束
+                }
+                else  //否则（g依然平衡），只需简单地
+                    UpdateHeight(n); //更新其高度（注意：即便g未失衡，高度亦可能增加）
+            } // 至多只需一次调整；若果真做过调整，则全树高度必然复原
+            return x;
+        }
+        void SwapData(Node x,Node y)
+        {
+            int d = x.Key;
+            x.Key = y.Key;
+            y.Key = d;
         }
 
-        public Node Remove(Node tree, Node n)
+        Node RemoveAt(Node x,out Node hot)
         {
-            if (tree == null || n == null)
-                return null;
+            Node succ=null;
+            Node parent = x.Parent;
+            if (!HasLeft(x))
+                succ = x.L;
+            else if (!HasRight(x))
+                succ = x.R;
+            else
+            {
+                succ = Successor(x);
+                SwapData(x, succ);
+                x = succ;
+                succ = x.Parent; //succ = Successor(x) 这行执行前，succ是x的后继，而且succ是x右子树中的一个节点，所以succ是没有左孩子的，可能有右孩子，那么succ的后继只能是succ.Parent，继succ=x.Parent
+                parent = x.Parent;                
+            }
             
-
-            if(n<tree)  // 待删除的节点在"tree的左子树"中
-            {
-                tree.L = Remove(tree.L, n);
-                // 删除节点后，若AVL树失去平衡，则进行相应的调节。
-                if (Height(tree.R)-Height(tree.L)==2)
-                {
-                    Node k1 = tree.R;
-                    if (Height(k1.L) < Height(k1.R))
-                        tree = RRRotation(tree);
-                    else
-                        tree = RLRotation(tree);
-                }
-
-
-            }
-            else if(n> tree) // 待删除的节点在"tree的右子树"中
-            {
-                tree.R = Remove(tree.R, n);
-                // 删除节点后，若AVL树失去平衡，则进行相应的调节。
-                if (Height(tree.L) - Height(tree.R) == 2)
-                {
-                    Node k1 = tree.L;
-                    if (Height(k1.L) > Height(k1.R))
-                        tree = LLRotation(tree);
-                    else
-                        tree = LRRotation(tree);
-                }
-            }
-            else // tree节点就是要删除的节点
-            {
-                // tree的左右孩子都存在
-                if (HasTwoChild(tree))
-                {
-                    if(Height(tree.L)>Height(tree.R))
-                    {
-                        // 如果tree的左子树比右子树高；
-                        // 则(01)找出tree的左子树中的最大节点
-                        //   (02)将该最大节点的值赋值给tree。
-                        //   (03)删除该最大节点。
-                        // 这类似于用"tree的左子树中最大节点"做"tree"的替身；
-                        // 采用这种方式的好处是：删除"tree的左子树中最大节点"之后，AVL树仍然是平衡的。
-                        Node max = Maximum(tree.L);
-                        tree.Key = max.Key;
-                        tree.L = Remove(tree.L, max);
-                    }
-                    else
-                    {
-                        // 如果tree的左子树不比右子树高(即它们相等，或右子树比左子树高1)
-                        // 则(01)找出tree的右子树中的最小节点
-                        //   (02)将该最小节点的值赋值给tree。
-                        //   (03)删除该最小节点。
-                        // 这类似于用"tree的右子树中最小节点"做"tree"的替身；
-                        // 采用这种方式的好处是：删除"tree的右子树中最小节点"之后，AVL树仍然是平衡的。
-
-                        Node min = Minimum(tree.R);
-                        tree.Key = min.Key;
-                        tree.R = Remove(tree.R, min);
-                    }
-                }
-                else
-                {
-                    Node tmp = tree;
-                    tree = tree.L!=null ? tree.L : tree.R;
-                    tmp.Parent = null;
-                    tmp.L = null;
-                    tmp.R=null;
-                }
-            }
-
-            return tree;
+            Connect(parent, succ);
+            hot = parent;
+            if (IsLeft(x))  x.Parent.L = null; //断开父节点的连接
+            else            x.Parent.R = null; //断开父节点的连接
+            x.L = x.R = x.Parent = null; //clean
+            
+            return x;
         }
 
-        #endregion
 
         #region print
         public void Print(Node node)
         {
             Console.Write($"{node.Key},");
         }
+        /// <summary>
+        /// 打印二叉树 打印数值最大3位数
+        /// </summary>
+        /// <param name="tree">树的根节点</param>
         public static void PrintTree(Node tree)
         {
             System.Text.StringBuilder builder = new System.Text.StringBuilder();
@@ -714,7 +821,7 @@ namespace Codingriver_AVL
                     
                     levels.Add(n);
                     queue1.Enqueue(l);
-                    queue1.Enqueue(r);
+                    queue1.Enqueue(r); 
                     nullCount += l == null ? 1 : 0;
                     nullCount += r == null ? 1 : 0;
                 }
@@ -772,33 +879,40 @@ namespace Codingriver_AVL
         {
             AVLTree tree = new AVLTree();
             Node n,n1,n2;
-            tree.Root= tree.CreateNode(6, null);
-            n=tree.CreateLNode(1, tree.Root);
-            n1=tree.CreateRNode(5, n);
-            n1= tree.CreateLNode(3, n1);
-            tree.CreateLNode(2, n1);
-            tree.CreateRNode(4, n1);
-
-            n2 =tree.CreateRNode(7, tree.Root);
-            n2 = tree.CreateRNode(9, n2);
-            tree.CreateLNode(8, n2);
-            n = tree.CreateRNode(15, n2);
-            tree.CreateLNode(12, n);
-            tree.CreateRNode(18, n);
-            n=tree.CreateLNode(10, n);
-            n = tree.CreateRNode(17, n);
-
+            tree.Insert(20);
+            tree.Insert(10);
+            tree.Insert(7);
+            tree.Insert(24);
+            tree.Insert(26);
+            tree.Insert(12);
+            tree.Insert(14);
+            tree.Insert(16);
+            tree.Insert(13);
+            tree.Insert(17);
+            tree.Insert(18);
+            Console.Write("   Preorder::");
             tree.Preorder(tree.Root);
             Console.WriteLine();
+            Console.Write("    Inorder::");
             tree.Inorder(tree.Root);
             Console.WriteLine();
+            Console.Write("  Postorder::");
             tree.Postorder(tree.Root);
             Console.WriteLine();
+            Console.Write(" Levelorder::");
             tree.Levelorder(tree.Root);
-            Console.WriteLine("\n\n\n\n\n");
-            PrintTree(tree.Root);
-            Console.WriteLine("\n\n\n\n\n");
-            
+            Console.WriteLine();
+            Console.Write(" ZLevelorder:");
+            tree.ZLevelorder(tree.Root);
+            Console.WriteLine("\n\n");
+
+            tree.Remove(14);
+            tree.Remove(12);
+            tree.Remove(10);
+            tree.Remove(7);
+            tree.Remove(26);
+            tree.Remove(17);
+
             Console.ReadKey();
         }
 
