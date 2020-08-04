@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Codingriver_AVL
@@ -290,7 +290,12 @@ namespace Codingriver_AVL
                 return i;
             return GetMaxNodeCountByDepth(i-1) * 2;
         }
-
+        void SwapData(Node x, Node y)
+        {
+            int d = x.Key;
+            x.Key = y.Key;
+            y.Key = d;
+        }
 
 
         /// <summary>
@@ -367,31 +372,6 @@ namespace Codingriver_AVL
             return n;
         }
 
-        /// <summary>
-        /// 查找键值key的节点并且返回（key对应节点为命中节点）
-        /// </summary>
-        /// <param name="tree">子树</param>
-        /// <param name="key">查找键值</param>
-        /// <param name="hot">返回命中节点的父节点，如果不存在命中节点则返回预判命中节点的父节点；（当命中节点为tree时，hot为NULL）</param>
-        /// <returns>命中节点</returns>
-        public Node SearchIn(Node tree, int key, out Node hot)
-        {
-            // hot :如果没有命中节点，则hot命中后做多只有一个节点，且key是对应另外一个孩子空节点位置
-
-            Node n=tree;
-            if (tree == key) //在子树根节点tree处命中
-            {
-                hot = null;
-                return tree;
-            }
-
-            for(; ; )
-            {
-                hot = n;
-                n = n > key ? n.L : n.R;
-                if (n==null||n == key) return n; //返回命中节点，hot指向父节点，hot必然命中（在key不存在时,n==null）
-            }
-        }
         #endregion
 
         #region 前驱节点、后继节点
@@ -565,7 +545,23 @@ namespace Codingriver_AVL
         #region 旋转 
 
         /// <summary>
-        /// 左旋转，逆时针旋转,单旋
+        /// zag 左旋转，逆时针旋转,单旋       
+        ///   （逆时针旋转g）  
+        ///         g          
+        ///        / \         
+        ///       T0  p        
+        ///          / \       
+        ///         T1  v      
+        ///            / \     
+        ///           T2  T3   
+        /// 
+        ///     zag单旋后：    
+        ///         p(b)         
+        ///       /     \      
+        ///      g(a)    v(c)     
+        ///     / \     / \    
+        ///    T0  T1  T2  T3  
+        /// 
         /// </summary>
         /// <param name="tree">非空孙辈节点</param>
         /// <returns>该树新的的根节点</returns>
@@ -585,7 +581,23 @@ namespace Codingriver_AVL
         }
 
         /// <summary>
-        /// 右旋转，顺时针旋转,单旋
+        /// Zig右旋，顺时针旋转,单旋
+        ///    （顺时针旋转g）
+        ///           g       
+        ///          / \      
+        ///         p   T3    
+        ///        / \        
+        ///       v   T2      
+        ///      / \          
+        ///     T0  T1        
+        /// 
+        ///   zig单旋后：     
+        ///         p(b)        
+        ///       /     \     
+        ///      v(a)    g(c)    
+        ///     / \     / \   
+        ///    T0  T1  T2  T3 
+        /// 
         /// </summary>
         /// <param name="tree">非空孙辈节点</param>
         /// <returns>该树新的的根节点</returns>
@@ -606,11 +618,28 @@ namespace Codingriver_AVL
         }
 
         /// <summary>
-        /// 双旋转，先tree的父节点Zag后对tree的祖父Zig，先对p左旋，后对g右旋
+        /// ZagZig 双旋(先左旋p后右旋g)
+        ///  
+        ///  （先逆时针旋转p(zag)，后顺时针旋转g(zig)）
+        ///                      g                     
+        ///                     / \                    
+        ///                    p   T3                  
+        ///                   / \                      
+        ///                  T0  v                     
+        ///                     / \                    
+        ///                    T1  T2                  
+        /// 
+        ///                zag-zig双旋后               
+        ///                     v(b)                    
+        ///                   /     \                  
+        ///                  p(a)    g(c)                 
+        ///                 / \     / \                
+        ///                T0  T1  T2  T3              
+        ///                
         /// </summary>
         /// <param name="tree">非空孙辈节点</param>
         /// <returns>该树新的的根节点</returns>
-        public Node ZigZag(Node tree)
+        public Node ZagZig(Node tree)
         {
             Node v = tree, p = v.Parent, g = p.Parent, r = g.Parent;
             Node a = p, b = v, c = g;
@@ -626,11 +655,27 @@ namespace Codingriver_AVL
         }
 
         /// <summary>
-        /// 双旋转，先Zig后Zag，先对p右旋，后对g左旋
+        /// ZigZag 双旋（先右旋p后左旋g）
+        ///（先顺时针旋转p(zig)，后逆时针旋转g(zag)）
+        ///                    g       
+        ///                   / \      
+        ///                 T0   p     
+        ///                     / \    
+        ///                    v   T3  
+        ///                   / \      
+        ///                  T1  T2    
+        ///        
+        ///               zig-zag双旋后
+        ///                   v(b)      
+        ///                 /     \    
+        ///                g(a)    p(c)   
+        ///               / \     / \  
+        ///              T0  T1  T2  T3
+        ///                     
         /// </summary>
         /// <param name="tree">非空孙辈节点</param>
         /// <returns>该树新的的根节点</returns>
-        public Node ZagZig(Node tree)
+        public Node ZigZag(Node tree)
         {
             Node v = tree, p = v.Parent, g = p.Parent, r = g.Parent;
             Node a = g, b = v, c = p;
@@ -656,13 +701,13 @@ namespace Codingriver_AVL
             if (IsLeft(p))
             {
                 if (IsLeft(v)) return Zig(v);
-                else return ZigZag(v);
+                else return ZagZig(v);
 
             }
             else
             {
                 if (IsRight(v)) return Zag(v);
-                else return ZagZig(v);
+                else return ZigZag(v);
             }
         }
 
@@ -714,6 +759,31 @@ namespace Codingriver_AVL
             return SearchIn(tree, key, out _);
         }
 
+        /// <summary>
+        /// 查找键值key的节点并且返回（key对应节点为命中节点）
+        /// </summary>
+        /// <param name="tree">子树</param>
+        /// <param name="key">查找键值</param>
+        /// <param name="hot">返回命中节点的父节点，如果不存在命中节点则返回预判命中节点的父节点；（当命中节点为tree时，hot为NULL）</param>
+        /// <returns>命中节点</returns>
+        public Node SearchIn(Node tree, int key, out Node hot)
+        {
+            // hot :如果没有命中节点，则hot命中后做多只有一个节点，且key是对应另外一个孩子空节点位置
+
+            Node n = tree;
+            if (tree == key) //在子树根节点tree处命中
+            {
+                hot = null;
+                return tree;
+            }
+
+            for (; ; )
+            {
+                hot = n;
+                n = n > key ? n.L : n.R;
+                if (n == null || n == key) return n; //返回命中节点，hot指向父节点，hot必然命中（在key不存在时,n==null）
+            }
+        }
 
         #endregion
 
@@ -753,34 +823,35 @@ namespace Codingriver_AVL
             } // 至多只需一次调整；若果真做过调整，则全树高度必然复原
             return x;
         }
-        void SwapData(Node x,Node y)
-        {
-            int d = x.Key;
-            x.Key = y.Key;
-            y.Key = d;
-        }
+
 
         Node RemoveAt(Node x,out Node hot)
         {
+            if (x == null)
+            {
+                hot = null;
+                return null;
+            }
+                
             Node succ=null;
             Node parent = x.Parent;
             if (!HasLeft(x))
-                succ = x.L;
-            else if (!HasRight(x))
                 succ = x.R;
+            else if (!HasRight(x))
+                succ = x.L;
             else
             {
                 succ = Successor(x);
                 SwapData(x, succ);
                 x = succ;
-                succ = x.Parent; //succ = Successor(x) 这行执行前，succ是x的后继，而且succ是x右子树中的一个节点，所以succ是没有左孩子的，可能有右孩子，那么succ的后继只能是succ.Parent，继succ=x.Parent
+                succ = x.R; //succ = Successor(x) 这行执行前，succ是x的后继，而且succ是x右子树中的一个节点，所以succ是没有左孩子的，可能有右孩子，那么succ的后继只能是succ.Parent，继succ=x.Parent
                 parent = x.Parent;                
             }
-            
+
+            if (IsLeft(x)) x.Parent.L = null; //断开父节点的连接
+            else if (IsRight(x)) x.Parent.R = null; //断开父节点的连接            
             Connect(parent, succ);
             hot = parent;
-            if (IsLeft(x))  x.Parent.L = null; //断开父节点的连接
-            else            x.Parent.R = null; //断开父节点的连接
             x.L = x.R = x.Parent = null; //clean
             
             return x;
@@ -881,15 +952,15 @@ namespace Codingriver_AVL
             Node n,n1,n2;
             tree.Insert(20);
             tree.Insert(10);
-            tree.Insert(7);
+            tree.Insert(7);  /* 执行zig （插入节点后右旋20）*/
             tree.Insert(24);
-            tree.Insert(26);
-            tree.Insert(12);
-            tree.Insert(14);
-            tree.Insert(16);
-            tree.Insert(13);
-            tree.Insert(17);
-            tree.Insert(18);
+            tree.Insert(26); /* 执行zag （插入节点后左旋20）*/
+            tree.Insert(12); /* 执行zig-zag （插入节点后先右旋24后左旋10）*/
+            tree.Insert(14); 
+            tree.Insert(16); /* 执行zag （插入节点后左旋12）*/
+            tree.Insert(13); /* 执行zig-zag （插入节点后先右旋14后左旋10）*/
+            tree.Insert(17); /* 执行zag-zig （插入节点后先左旋12后右旋20）*/
+            tree.Insert(18);  /* 执行zag （插入节点后左旋16）*/
             Console.Write("   Preorder::");
             tree.Preorder(tree.Root);
             Console.WriteLine();
@@ -907,11 +978,12 @@ namespace Codingriver_AVL
             Console.WriteLine("\n\n");
 
             tree.Remove(14);
-            tree.Remove(12);
+            tree.Remove(12);/* 执行zig （删除节点后右旋13）*/
             tree.Remove(10);
-            tree.Remove(7);
-            tree.Remove(26);
+            tree.Remove(7); /* 执行zag （删除节点后左旋16）*/
+            tree.Remove(26);/* 执行zag-zig （删除节点后先左旋16后右旋20）*/
             tree.Remove(17);
+            tree.Remove(18);
 
             Console.ReadKey();
         }

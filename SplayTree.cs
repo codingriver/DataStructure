@@ -712,8 +712,6 @@ namespace Codingriver_Splay
                         AttachAsRChild(p, v.L); AttachAsLChild(g, v.R);
                         AttachAsRChild(v, g); AttachAsLChild(v, p);
                     }
-
-
                 }
 
                 if (r == null)//若原v的曾祖父r不存在，则v现在为树根Root
@@ -798,16 +796,6 @@ namespace Codingriver_Splay
             Root = Splay(x != null ? x : hot); //最后x或者hot旋转到根节点，设置树根
             return Root;
         }
-
-
-        #endregion
-
-
-
-
-
-
-
         /// <summary>
         /// 删除节点
         /// </summary>
@@ -820,12 +808,12 @@ namespace Codingriver_Splay
             PrintTree(Root);//打印日志 打印树
             return n;
         }
-        Node Remove(Node tree,int key)
+        Node Remove(Node tree, int key)
         {
             if (tree == null)
                 return null;
 
-            Node x= Search(tree, key);
+            Node x = Search(tree, key);
             if (x != key)
                 return null;
             x = RemoveAt(x);
@@ -839,7 +827,7 @@ namespace Codingriver_Splay
             {
                 return null;
             }
-            Node succ=null;
+            Node succ = null;
             Node parent = x.Parent; //x为root节点，parent=null；
             if (!HasLeft(x))
                 succ = x.R;
@@ -851,16 +839,20 @@ namespace Codingriver_Splay
                 SwapData(x, succ);
                 x = succ;
                 succ = x.R; //succ = Successor(x) 这行执行前，succ是x的后继，而且succ是x右子树中的一个节点，所以succ是没有左孩子的，可能有右孩子，那么succ的后继只能是succ.Parent，继succ=x.Parent
-                parent = x.Parent;                
+                parent = x.Parent;
             }
 
             if (IsLeft(x)) x.Parent.L = null; //断开父节点的连接
-            else if(IsRight(x)) x.Parent.R = null; //断开父节点的连接            
+            else if (IsRight(x)) x.Parent.R = null; //断开父节点的连接            
             Connect(parent, succ);
             x.L = x.R = x.Parent = null; //clean
-            
+
             return x;
         }
+
+        #endregion
+
+
         void SwapData(Node x, Node y)
         {
             int d = x.Key;

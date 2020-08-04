@@ -18,7 +18,10 @@ namespace Codingriver
         }
         public Node(int key, Node parent, Node left=null, Node right=null)
         {
-
+            Key = key;
+            Parent = parent;
+            L = left;
+            R = right;
         }
         public static Node operator++(Node a)
         {
@@ -229,22 +232,16 @@ namespace Codingriver
         {
             return n != null && n.R != null;
         }
-        public int GetDepth(Node n)
-        {
-            if (n == null)
-                return 0;
-            if (n == Root)
-                return 1;
-            return GetDepth(n.Parent) + 1;
-        }
 
+        /// <summary>
+        /// 树的高度
+        /// 树的高度为最大层次。即空的二叉树的高度是0，非空树的高度等于它的最大层次(根的层次为1，根的子节点为第2层，依次类推)
+        /// </summary>
+        /// <param name="n"></param>
+        /// <returns></returns>
         public int GetHeight(Node n)
         {
-            if (n == null)
-                return 0;
-            if (n == Root)
-                return 1;
-            return GetHeight(n.Parent) + 1;
+            return n == null ? 0 : GetHeight(n.Parent) + 1;
         }
 
         public Node Maximum(Node n)
@@ -430,6 +427,7 @@ namespace Codingriver
                 }
             }
         }
+
         #endregion
 
         #region 增、删、查
