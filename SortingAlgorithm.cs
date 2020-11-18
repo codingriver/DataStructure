@@ -101,7 +101,7 @@ namespace Codingriver
         void InsertionSort(int[] A)
         {
             int n = A.Length;
-            for (int i = 1; i < n - 1; i++) //第一个当做有序序列
+            for (int i = 1; i < n ; i++) //第一个当做有序序列
             {
                 for (int j = i; j > 0 && A[j - 1] > A[j]; j--) //内循环使用冒泡方式对前面有序序列进行插入
                 {
@@ -120,7 +120,7 @@ namespace Codingriver
         {
             int n = A.Length;
             int j, tmp;
-            for (int i = 1; i < n - 1; i++) //第一个当做有序序列
+            for (int i = 1; i < n; i++) //第一个当做有序序列
             {
                 tmp = A[i];
                 for (j = i; j > 0 && A[j - 1] > tmp; j--) //内循环使用冒泡方式对前面有序序列进行插入
@@ -707,9 +707,9 @@ namespace Codingriver
             return A;
         }
 
-        static void PrintArray(int[] A,bool p=false)
+        static void PrintArray(int[] A, bool p = false)
         {
-            if(!p)
+            if (!p)
             {
                 return; //注释输出，测试排序耗时
             }
